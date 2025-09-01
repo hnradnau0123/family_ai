@@ -15,7 +15,7 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'Curiosity Co-pilot - Discover Your Child\'s Unique Spark',
+  title: 'Irori - Family Hearth - Discover Your Child\'s Unique Spark',
   description: 'Transform everyday conversations into deep insights about your child\'s interests, curiosity patterns, and cognitive strengths.',
   keywords: ['parenting', 'child development', 'family engagement', 'curiosity', 'AI insights'],
 }

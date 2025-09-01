@@ -1,4 +1,6 @@
-# 🧠✨ Curiosity Co-pilot
+# 🔥✨ Irori (囲炉裏)
+
+*"Hearth" - A warm gathering place for families*
 
 A Next.js web application that analyzes parent-child conversations to discover curiosity patterns, generate insights, and provide personalized recommendations for children's development.
 
@@ -41,8 +43,8 @@ A Next.js web application that analyzes parent-child conversations to discover c
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/family_ai.git
-   cd family_ai
+   git clone https://github.com/yourusername/irori.git
+   cd irori
    ```
 
 2. **Install dependencies**
@@ -180,4 +182,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ for families who value curiosity and connection**
+**Built with ❤️ for families who gather around the hearth of curiosity and connection**
