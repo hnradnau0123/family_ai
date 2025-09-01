@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const conversations = await prisma.conversation.findMany({
       where: {
         child: {
-          parentId: session.user.id
+          parentId: (session?.user as any)?.id
         }
       },
       include: {
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     const child = await prisma.child.findFirst({
       where: {
         id: childId,
-        parentId: session.user.id
+        parentId: (session?.user as any)?.id
       }
     })
 

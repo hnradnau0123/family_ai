@@ -238,7 +238,7 @@ Return just the conversation starter text, nothing else.
 
 export async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
   try {
-    const file = new File([audioBuffer], 'audio.wav', { type: 'audio/wav' })
+    const file = new File([new Uint8Array(audioBuffer)], 'audio.wav', { type: 'audio/wav' })
     
     const response = await openai.audio.transcriptions.create({
       file: file,

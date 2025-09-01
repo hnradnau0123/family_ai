@@ -140,7 +140,7 @@ export async function saveRecommendations(
     description: rec.description,
     category: rec.category,
     ageGroup: rec.ageGroup,
-    tags: rec.tags,
+    tags: JSON.stringify(rec.tags),
     provider: rec.provider,
     url: rec.url,
     location: rec.location,

@@ -96,6 +96,51 @@ export default function NewConversationPage() {
     setShowRecorder(false)
   }
 
+  const handleRealTimeConversationComplete = async (analysis: any) => {
+    // For real-time conversations, we might receive analysis data
+    console.log('Real-time conversation completed:', analysis)
+    // Navigate back to dashboard or show completion message
+    router.push('/dashboard')
+  }
+
+  const handleAdvancedConversationEnd = async (turns: any[]) => {
+    // Convert conversation turns to a format similar to audio recording
+    const conversationText = turns
+      .map(turn => `${turn.speaker}: ${turn.content}`)
+      .join('\n')
+    
+    // Create a synthetic conversation record
+    setLoading(true)
+    try {
+      const response = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          childId: selectedChildId,
+          title: title || 'AI Facilitated Conversation',
+          transcript: conversationText,
+          duration: turns.length * 30, // Estimate 30 seconds per turn
+          mode: 'advanced_facilitator'
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        router.push(`/dashboard/conversations/${data.conversation.id}`)
+      } else {
+        const error = await response.json()
+        alert(error.error || 'Failed to save conversation')
+      }
+    } catch (error) {
+      console.error('Error saving conversation:', error)
+      alert('Failed to save conversation')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const selectedChild = children?.find(child => child.id === selectedChildId)
 
   if (!children || children.length === 0) {
@@ -327,7 +372,7 @@ export default function NewConversationPage() {
             childId={selectedChildId}
             childName={selectedChild?.name || ''}
             childAge={selectedChild ? Math.floor((Date.now() - new Date(selectedChild.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 0}
-            onConversationComplete={handleRecordingComplete}
+            onConversationComplete={handleRealTimeConversationComplete}
           />
         ) : conversationMode === 'interactive' ? (
           <ImprovedInteractiveAI
@@ -340,7 +385,7 @@ export default function NewConversationPage() {
             childId={selectedChildId}
             childName={selectedChild?.name || ''}
             childAge={selectedChild ? Math.floor((Date.now() - new Date(selectedChild.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 0}
-            onConversationEnd={handleRecordingComplete}
+            onConversationEnd={handleAdvancedConversationEnd}
           />
         )
       )}

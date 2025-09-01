@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -16,27 +16,27 @@ export async function GET(request: NextRequest) {
     const [childrenCount, totalConversations, totalInsights, recentConversations] = await Promise.all([
       // Count children
       prisma.child.count({
-        where: { parentId: session.user.id }
+        where: { parentId: (session?.user as any)?.id }
       }),
       
       // Count conversations
       prisma.conversation.count({
         where: {
-          child: { parentId: session.user.id }
+          child: { parentId: (session?.user as any)?.id }
         }
       }),
       
       // Count insights
       prisma.insight.count({
         where: {
-          child: { parentId: session.user.id }
+          child: { parentId: (session?.user as any)?.id }
         }
       }),
       
       // Get recent conversations
       prisma.conversation.findMany({
         where: {
-          child: { parentId: session.user.id }
+          child: { parentId: (session?.user as any)?.id }
         },
         include: {
           child: {
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     // Get recent insights for conversation starter
     const recentInsights = await prisma.insight.findMany({
       where: {
-        child: { parentId: session.user.id }
+        child: { parentId: (session?.user as any)?.id }
       },
       orderBy: { createdAt: 'desc' },
       take: 3

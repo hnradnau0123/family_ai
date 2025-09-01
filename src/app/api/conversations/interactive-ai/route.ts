@@ -12,14 +12,23 @@ interface AIResponse {
 }
 
 export async function POST(request: NextRequest) {
+  // Declare variables outside try block so they're available in catch
+  let childId: string = ''
+  let childName: string = ''
+  let childAge: number = 0
+  
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.id) {
+    if (!session?.user || !(session?.user as any)?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { childId, childName, childAge, conversationHistory, conversationPhase, childInteractionCount, userInput } = await request.json()
+    const requestBody = await request.json()
+    childId = requestBody.childId
+    childName = requestBody.childName || 'friend'
+    childAge = requestBody.childAge || 5
+    const { conversationHistory, conversationPhase, childInteractionCount, userInput } = requestBody
 
     if (!childId || !childName || childAge === undefined) {
       return NextResponse.json(

@@ -46,7 +46,7 @@ export async function GET(
     console.log('🎯 Generating insight visualization data')
     
     const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       console.log('❌ Unauthorized request')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -58,7 +58,7 @@ export async function GET(
     const child = await prisma.child.findFirst({
       where: {
         id: childId,
-        parentId: session.user.id
+        parentId: (session?.user as any)?.id
       },
       include: {
         insights: {

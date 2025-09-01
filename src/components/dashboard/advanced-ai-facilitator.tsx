@@ -88,7 +88,7 @@ export default function AdvancedAIFacilitator({
       
       const turn: ConversationTurn = {
         id: Date.now().toString(),
-        speaker: voiceDetection.speakerType,
+        speaker: voiceDetection.speakerType === 'unknown' ? 'parent' : voiceDetection.speakerType,
         content: transcript,
         timestamp: new Date(),
         confidence: voiceDetection.confidence,
@@ -96,7 +96,7 @@ export default function AdvancedAIFacilitator({
       }
 
       setConversationTurns(prev => [...prev, turn])
-      setLastSpeaker(voiceDetection.speakerType)
+      setLastSpeaker(voiceDetection.speakerType === 'unknown' ? null : voiceDetection.speakerType)
       
       // Update conversation topic analysis
       updateConversationTopic(transcript)
@@ -148,7 +148,7 @@ export default function AdvancedAIFacilitator({
     // Welcome message
     await speakFacilitatorMessage(
       `Hello ${childName} and family! I'm here to help make your conversation even more wonderful. I'll listen quietly and occasionally offer gentle suggestions to help you explore ideas together.`,
-      'welcoming'
+      'supportive'
     )
   }
 
@@ -174,7 +174,7 @@ export default function AdvancedAIFacilitator({
 
   const speakFacilitatorMessage = async (
     message: string, 
-    tone: 'encouraging' | 'curious' | 'supportive' | 'welcoming' = 'supportive'
+    tone: 'encouraging' | 'curious' | 'supportive' | 'playful' = 'supportive'
   ) => {
     if (isSpeaking) return
     

@@ -93,7 +93,7 @@ Child: I would ask them what games they play! And if they have playgrounds. And 
 Parent: Those are wonderful questions. Why do you think making friends is important?
 
 Child: Because friends make everything more fun! Even scary things become less scary when you have friends.`,
-        audioUrl: null,
+        audioUrl: undefined,
         processed: true,
         createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
         insights: [

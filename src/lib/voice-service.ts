@@ -1,11 +1,8 @@
-import { ElevenLabsApi, ElevenLabsOptions } from '@elevenlabs/elevenlabs-js'
-
 interface VoiceProfile {
   id: string
   name: string
   type: 'parent' | 'child' | 'facilitator'
   description: string
-  elevenLabsVoiceId?: string
 }
 
 interface VoiceDetectionResult {
@@ -16,46 +13,10 @@ interface VoiceDetectionResult {
 }
 
 class VoiceService {
-  private elevenLabs: ElevenLabsApi | null = null
   private audioContext: AudioContext | null = null
   
-  // Pre-defined voice profiles for different family members
-  private voiceProfiles: VoiceProfile[] = [
-    {
-      id: 'facilitator-calm',
-      name: 'Calm Facilitator',
-      type: 'facilitator',
-      description: 'Warm, gentle voice for guiding family conversations',
-      elevenLabsVoiceId: 'EXAVITQu4vr4xnSDxMaL', // Bella - warm female voice
-    },
-    {
-      id: 'facilitator-friendly',
-      name: 'Friendly Guide',
-      type: 'facilitator', 
-      description: 'Approachable voice for encouraging dialogue',
-      elevenLabsVoiceId: 'ErXwobaYiN019PkySvjV', // Antoni - friendly male voice
-    },
-    {
-      id: 'child-companion',
-      name: 'Child Companion',
-      type: 'facilitator',
-      description: 'Younger-sounding voice for connecting with children',
-      elevenLabsVoiceId: 'AZnzlk1XvdvUeBnXmlld', // Domi - youthful voice
-    }
-  ]
-
   constructor() {
-    this.initializeElevenLabs()
     this.initializeAudioContext()
-  }
-
-  private initializeElevenLabs() {
-    const apiKey = process.env.ELEVENLABS_API_KEY
-    if (apiKey) {
-      this.elevenLabs = new ElevenLabsApi({
-        apiKey: apiKey,
-      } as ElevenLabsOptions)
-    }
   }
 
   private initializeAudioContext() {
@@ -107,7 +68,7 @@ class VoiceService {
   }
 
   /**
-   * Generate speech using ElevenLabs with contextual voice selection
+   * Generate speech using ElevenLabs API (via server route) with fallback to Web Speech API
    */
   async generateSpeech(
     text: string, 
@@ -117,35 +78,29 @@ class VoiceService {
       childAge?: number
     } = {}
   ): Promise<ArrayBuffer | null> {
-    if (!this.elevenLabs) {
-      console.warn('ElevenLabs not initialized, falling back to Web Speech API')
-      return this.fallbackWebSpeech(text, context)
-    }
-
     try {
-      // Select appropriate voice based on context
-      const voiceProfile = this.selectVoiceProfile(context)
-      
-      // Add natural conversation markers and emotional context
-      const enhancedText = this.enhanceTextForSpeech(text, context)
-      
-      const response = await this.elevenLabs.textToSpeech.textToSpeech(
-        voiceProfile.elevenLabsVoiceId!,
-        {
-          text: enhancedText,
-          model_id: 'eleven_multilingual_v2',
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.8,
-            style: 0.2,
-            use_speaker_boost: true
-          }
-        }
-      )
+      // Try ElevenLabs via API route first
+      const response = await fetch('/api/voice/synthesize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text,
+          emotionalTone: context.emotionalTone,
+          childAge: context.childAge
+        })
+      })
 
-      return await response.arrayBuffer()
+      if (response.ok && response.headers.get('content-type')?.includes('audio')) {
+        return await response.arrayBuffer()
+      } else {
+        // If API indicates fallback needed, use Web Speech API
+        console.log('🔄 Falling back to Web Speech API')
+        return this.fallbackWebSpeech(text, context)
+      }
     } catch (error) {
-      console.error('ElevenLabs speech generation error:', error)
+      console.error('❌ Voice synthesis error:', error)
       return this.fallbackWebSpeech(text, context)
     }
   }
@@ -215,33 +170,6 @@ class VoiceService {
   }
 
   // Private helper methods
-  private selectVoiceProfile(context: any): VoiceProfile {
-    if (context.childAge && context.childAge < 8) {
-      return this.voiceProfiles.find(v => v.id === 'child-companion') || this.voiceProfiles[0]
-    }
-    
-    if (context.emotionalTone === 'playful') {
-      return this.voiceProfiles.find(v => v.id === 'facilitator-friendly') || this.voiceProfiles[1]
-    }
-    
-    return this.voiceProfiles[0] // Default to calm facilitator
-  }
-
-  private enhanceTextForSpeech(text: string, context: any): string {
-    // Add natural pauses and emphasis
-    let enhanced = text.replace(/\./g, '... ')
-    enhanced = enhanced.replace(/\?/g, '? ')
-    enhanced = enhanced.replace(/!/g, '! ')
-    
-    // Add emotional context
-    if (context.emotionalTone === 'encouraging') {
-      enhanced = `*speaking warmly* ${enhanced}`
-    } else if (context.emotionalTone === 'curious') {
-      enhanced = `*with genuine curiosity* ${enhanced}`
-    }
-    
-    return enhanced
-  }
 
   private async fallbackWebSpeech(text: string, context: any): Promise<ArrayBuffer | null> {
     // Fallback to Web Speech API if ElevenLabs fails

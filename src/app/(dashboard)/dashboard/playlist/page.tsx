@@ -91,7 +91,7 @@ async function getRecommendations(childId: string): Promise<RecommendationData |
     console.log('❌ Recommendations API response not ok:', response.status)
     return null
   } catch (error) {
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       console.error('❌ Recommendations request timed out after 45 seconds')
     } else {
       console.error('❌ Failed to fetch recommendations:', error)
@@ -403,7 +403,7 @@ export default function SuggestionPlaylistPage() {
       
       const childrenData = await childrenResponse.json()
       console.log('✅ Children data received:', childrenData.length, 'children')
-      console.log('👶 Children:', childrenData.map(c => ({ id: c.id, name: c.name })))
+      console.log('👶 Children:', childrenData.map((c: any) => ({ id: c.id, name: c.name })))
       
       setChildren(childrenData)
       
@@ -455,7 +455,7 @@ export default function SuggestionPlaylistPage() {
         <p className="text-red-600">{error}</p>
         <div className="text-sm text-gray-600">
           <p>Session status: {status}</p>
-          <p>User ID: {session?.user?.id || 'Not available'}</p>
+          <p>User ID: {(session?.user as any)?.id || 'Not available'}</p>
         </div>
         <Button onClick={fetchData} className="mt-4">
           Try Again
@@ -475,7 +475,7 @@ export default function SuggestionPlaylistPage() {
           <h3 className="font-medium mb-2">Debug Information:</h3>
           <p><strong>Session Status:</strong> {status}</p>
           <p><strong>User Email:</strong> {session?.user?.email || 'Not available'}</p>
-          <p><strong>User ID:</strong> {session?.user?.id || 'Not available'}</p>
+          <p><strong>User ID:</strong> {(session?.user as any)?.id || 'Not available'}</p>
           <p><strong>Children Found:</strong> {children.length}</p>
           {error && <p><strong>Last Error:</strong> {error}</p>}
         </div>

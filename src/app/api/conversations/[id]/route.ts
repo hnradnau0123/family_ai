@@ -10,7 +10,7 @@ export async function GET(
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -20,7 +20,7 @@ export async function GET(
       where: {
         id: id,
         child: {
-          parentId: session.user.id
+          parentId: (session?.user as any)?.id
         }
       },
       include: {

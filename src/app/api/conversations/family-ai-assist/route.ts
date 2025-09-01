@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     console.log('🔥 Family AI Assist API called')
     
     const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    if (!session?.user || !(session?.user as any)?.id) {
       console.log('❌ Unauthorized request')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

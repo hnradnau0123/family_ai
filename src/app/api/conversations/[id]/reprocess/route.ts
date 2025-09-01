@@ -10,7 +10,7 @@ export async function POST(
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.id) {
+    if (!session?.user || !(session.user as any)?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -21,7 +21,7 @@ export async function POST(
       where: {
         id: id,
         child: {
-          parentId: session.user.id
+          parentId: (session?.user as any)?.id
         }
       },
       include: {
@@ -44,7 +44,7 @@ export async function POST(
     try {
       const childAge = Math.floor((Date.now() - conversation.child.birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000))
       const { analyzeConversation } = await import('@/lib/openai')
-      const analysis = await analyzeConversation(conversation.transcription, conversation.child.name, childAge)
+      const analysis = await analyzeConversation(conversation.transcription || '', conversation.child.name, childAge)
 
       // Save insights to database
       for (const insight of analysis.insights) {

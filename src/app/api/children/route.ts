@@ -8,10 +8,10 @@ export async function GET(request: NextRequest) {
     console.log('🔍 Children API called')
     
     const session = await getServerSession(authOptions)
-    console.log('👤 Session user ID:', session?.user?.id)
+    console.log('👤 Session user ID:', (session?.user as any)?.id)
     console.log('📧 Session user email:', session?.user?.email)
 
-    if (!session?.user?.id) {
+    if (!session?.user || !(session.user as any)?.id) {
       console.log('❌ No session or user ID')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     // Get children from database
     const children = await prisma.child.findMany({
       where: {
-        parentId: session.user.id
+        parentId: (session?.user as any)?.id
       },
       include: {
         _count: {
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    console.log('👶 Found', children.length, 'children for user', session.user.id)
+    console.log('👶 Found', children.length, 'children for user', (session?.user as any)?.id)
     console.log('📊 Children:', children.map(c => ({ id: c.id, name: c.name })))
 
     return NextResponse.json(children)
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.id) {
+    if (!session?.user || !(session.user as any)?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -68,14 +68,14 @@ export async function POST(request: NextRequest) {
 
     // Verify user exists in database
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id }
+      where: { id: (session?.user as any)?.id }
     })
 
     if (!user) {
       // Create user if not exists (should not happen with proper auth flow)
       await prisma.user.create({
         data: {
-          id: session.user.id,
+          id: (session?.user as any)?.id,
           email: session.user.email || 'unknown@example.com',
           name: session.user.name || 'Unknown User'
         }
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         birthDate: new Date(birthDate),
-        parentId: session.user.id
+        parentId: (session?.user as any)?.id
       }
     })
 

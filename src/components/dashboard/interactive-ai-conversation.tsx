@@ -177,7 +177,8 @@ export function InteractiveAIConversation({
       content: welcomeMessage,
       reasoning: 'Welcome and invitation to share curiosity',
       urgency: 'high',
-      shouldSpeak: true
+      shouldSpeak: true,
+      isForParent: false
     })
     
     if (aiVolume) {

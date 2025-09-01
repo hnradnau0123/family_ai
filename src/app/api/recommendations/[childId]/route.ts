@@ -13,27 +13,26 @@ interface InsightAnalysis {
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ childId: string }> }) {
-  let childId: string
+  // Get childId early to ensure it's available in catch blocks
+  const paramData = await params
+  const childId = paramData.childId
   let session: any
   
   try {
     console.log('🎯 Generating recommendations API called')
     
     session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       console.log('❌ Unauthorized request')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
-    const paramData = await params
-    childId = paramData.childId
     console.log('📨 Generating recommendations for child:', childId)
 
     // Fetch child data and verify ownership
     const child = await prisma.child.findFirst({
       where: {
         id: childId,
-        parentId: session.user.id
+        parentId: (session?.user as any)?.id
       },
       include: {
         conversations: {
@@ -99,7 +98,7 @@ CHILD ANALYSIS:
 - Strengths: ${insightAnalysis.strengths.join(', ') || 'Problem-solving and creativity'}
 
 RECENT CONVERSATION THEMES:
-${child.conversations.slice(0, 3).map(conv => `- ${conv.title}: ${conv.transcription.slice(0, 100)}...`).join('\n')}
+${child.conversations.slice(0, 3).map(conv => `- ${conv.title}: ${(conv.transcription || '').slice(0, 100)}...`).join('\n')}
 
 Create personalized recommendations in the following categories. Make them specific, age-appropriate, and aligned with the child's demonstrated interests and developmental needs.
 
@@ -231,7 +230,7 @@ GUIDELINES:
     try {
       console.log('🔄 Falling back to existing recommendations from database...')
       const child = await prisma.child.findFirst({
-        where: { id: childId, parentId: session!.user!.id },
+        where: { id: childId, parentId: (session?.user as any)?.id },
         include: { recommendations: { where: { isActive: true }, orderBy: { createdAt: 'desc' } } }
       })
       
@@ -334,8 +333,17 @@ function convertDbRecommendationsToFormat(dbRecommendations: any[], childName: s
   console.log('🔄 Converting', dbRecommendations.length, 'database recommendations')
   
   // Group recommendations by type and category
-  const content = { music: [], movies: [], shows: [], anime: [] }
-  const activities = { hobbies: [], lessons: [], events: [] }
+  const content = { 
+    music: [] as any[], 
+    movies: [] as any[], 
+    shows: [] as any[], 
+    anime: [] as any[]
+  }
+  const activities = { 
+    hobbies: [] as any[], 
+    lessons: [] as any[], 
+    events: [] as any[]
+  }
   
   dbRecommendations.forEach(rec => {
     const tags = JSON.parse(rec.tags || '[]')
@@ -380,7 +388,7 @@ function convertDbRecommendationsToFormat(dbRecommendations: any[], childName: s
           description: rec.description,
           reason: `Based on interests: ${tags.join(', ')}`,
           difficulty: "Beginner",
-          materials: tags.filter(tag => tag !== 'nature' && tag !== 'observation')
+          materials: tags.filter((tag: any) => tag !== 'nature' && tag !== 'observation')
         })
       } else if (rec.category.toLowerCase().includes('lesson')) {
         activities.lessons.push({
