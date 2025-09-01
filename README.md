@@ -26,7 +26,7 @@ A Next.js web application that analyzes parent-child conversations to discover c
 ## 🏗️ Technical Stack
 
 - **Frontend**: Next.js 15, React 18, TypeScript
-- **Styling**: Tailwind CSS with custom warm color palette
+- **Styling**: Tailwind CSS with custom blue color palette
 - **Database**: SQLite with Prisma ORM
 - **Authentication**: NextAuth.js with credentials provider
 - **AI Integration**: OpenAI API (GPT-4, Whisper)
@@ -98,7 +98,7 @@ The application analyzes conversations using established psychological framework
 
 ## 🎨 Design Philosophy
 
-- **Warm, Human-Centered Design**: Soft colors and approachable UI
+- **Calm, Trustworthy Design**: Soft blue tones and approachable UI
 - **Child Development Focus**: Age-appropriate interactions and insights
 - **Family Engagement**: Tools that bring families together rather than replace interaction
 - **Privacy-First**: Local database storage with secure authentication
