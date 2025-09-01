@@ -16,6 +16,7 @@ A Next.js web application that analyzes parent-child conversations to discover c
 - **📹 Audio Recording**: Traditional conversation recording and analysis
 - **💡 AI Suggestion Mode**: Real-time guidance for parents during conversations
 - **🤖 Interactive AI Partner**: Family conversation facilitator with voice interaction
+- **🧠 Advanced AI Facilitator**: Premium mode with ElevenLabs voice synthesis, parent/child voice detection, and research-based interventions
 
 ### 📊 Analytics & Visualization
 - **Child Profiles**: Individual profiles with age-appropriate insights
@@ -30,7 +31,8 @@ A Next.js web application that analyzes parent-child conversations to discover c
 - **Database**: SQLite with Prisma ORM
 - **Authentication**: NextAuth.js with credentials provider
 - **AI Integration**: OpenAI API (GPT-4, Whisper)
-- **Voice**: Web Speech API for real-time voice recognition and synthesis
+- **Voice Synthesis**: ElevenLabs API for premium voice quality + Web Speech API fallback
+- **Voice Recognition**: Web Speech API for real-time voice recognition and speaker detection
 
 ## 🚀 Getting Started
 
@@ -38,6 +40,7 @@ A Next.js web application that analyzes parent-child conversations to discover c
 
 - Node.js 18+ and npm
 - OpenAI API key ([Get one here](https://platform.openai.com/account/api-keys))
+- ElevenLabs API key ([Get one here](https://elevenlabs.io)) - Optional, for premium voice features
 
 ### Installation
 

@@ -10,6 +10,7 @@ import { AudioRecorder } from '@/components/dashboard/audio-recorder'
 import { RealTimeConversation } from '@/components/dashboard/real-time-conversation'
 import { InteractiveAIConversation } from '@/components/dashboard/interactive-ai-conversation'
 import { ImprovedInteractiveAI } from '@/components/dashboard/improved-interactive-ai'
+import AdvancedAIFacilitator from '@/components/dashboard/advanced-ai-facilitator'
 import { ArrowLeft, MessageCircle, Users, Sparkles, Brain } from 'lucide-react'
 import Link from 'next/link'
 
@@ -29,7 +30,7 @@ export default function NewConversationPage() {
   const [title, setTitle] = useState('')
   const [loading, setLoading] = useState(false)
   const [showRecorder, setShowRecorder] = useState(false)
-  const [conversationMode, setConversationMode] = useState<'traditional' | 'realtime' | 'interactive'>('traditional')
+  const [conversationMode, setConversationMode] = useState<'traditional' | 'realtime' | 'interactive' | 'advanced'>('traditional')
 
   useEffect(() => {
     fetchChildren()
@@ -265,10 +266,28 @@ export default function NewConversationPage() {
                   <div className="flex items-center gap-3 mb-2">
                     <Brain className="h-5 w-5 text-purple-600" />
                     <span className="font-medium">Interactive AI Partner</span>
-                    <span className="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded font-medium">NEW!</span>
                   </div>
                   <p className="text-sm text-neutral-600">
                     AI speaks directly to your child - asking questions, sharing facts, and encouraging curiosity
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setConversationMode('advanced')}
+                  className={`p-4 border rounded-lg text-left transition-colors ${
+                    conversationMode === 'advanced'
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <Users className="h-5 w-5 text-blue-600" />
+                    <span className="font-medium">Advanced AI Facilitator</span>
+                    <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded font-medium">PREMIUM</span>
+                  </div>
+                  <p className="text-sm text-neutral-600">
+                    Research-based AI facilitator with voice detection, ElevenLabs synthesis, and real-time parent guidance
                   </p>
                 </button>
               </div>
@@ -310,13 +329,20 @@ export default function NewConversationPage() {
             childAge={selectedChild ? Math.floor((Date.now() - new Date(selectedChild.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 0}
             onConversationComplete={handleRecordingComplete}
           />
-                       ) : (
-                 <ImprovedInteractiveAI
-                   childId={selectedChildId}
-                   childName={selectedChild?.name || ''}
-                   childAge={selectedChild ? Math.floor((Date.now() - new Date(selectedChild.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 0}
-                 />
-               )
+        ) : conversationMode === 'interactive' ? (
+          <ImprovedInteractiveAI
+            childId={selectedChildId}
+            childName={selectedChild?.name || ''}
+            childAge={selectedChild ? Math.floor((Date.now() - new Date(selectedChild.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 0}
+          />
+        ) : (
+          <AdvancedAIFacilitator
+            childId={selectedChildId}
+            childName={selectedChild?.name || ''}
+            childAge={selectedChild ? Math.floor((Date.now() - new Date(selectedChild.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 0}
+            onConversationEnd={handleRecordingComplete}
+          />
+        )
       )}
 
       {/* Tips */}
