@@ -1,11 +1,14 @@
 import OpenAI from 'openai'
+import { isDemoMode, getDemoConversationStarter, demoConfig } from './demo-config'
 
-if (!process.env.OPENAI_API_KEY) {
+// Allow demo mode without throwing error
+const apiKey = process.env.OPENAI_API_KEY
+if (!apiKey && !isDemoMode) {
   throw new Error('Missing OPENAI_API_KEY environment variable')
 }
 
 export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: apiKey || 'demo-key',
 })
 
 export interface ConversationAnalysis {
@@ -212,6 +215,12 @@ The conversation starter should:
 Return just the conversation starter text, nothing else.
 `
 
+  // Use demo mode if OpenAI is not available
+  if (isDemoMode) {
+    const starter = getDemoConversationStarter()
+    return starter.replace(/\{childName\}/g, childName)
+  }
+
   try {
     const response = await openai.chat.completions.create({
       model: 'gpt-4-turbo-preview',
@@ -232,7 +241,9 @@ Return just the conversation starter text, nothing else.
     return response.choices[0]?.message?.content?.trim() || 'What do you think would happen if we could talk to animals?'
   } catch (error) {
     console.error('Error generating conversation starter:', error)
-    return 'What do you think would happen if we could talk to animals?'
+    // Fallback to demo mode
+    const starter = getDemoConversationStarter()
+    return starter.replace(/\{childName\}/g, childName)
   }
 }
 
