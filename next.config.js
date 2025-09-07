@@ -12,8 +12,6 @@ const nextConfig = {
     };
     return config;
   },
-  // For Amplify hosting
-  output: 'standalone',
 }
 
 module.exports = nextConfig
