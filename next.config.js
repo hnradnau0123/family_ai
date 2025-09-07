@@ -12,7 +12,7 @@ const nextConfig = {
     };
     return config;
   },
-  // Railway deployment configuration
+  // For Amplify hosting
   output: 'standalone',
 }
 
