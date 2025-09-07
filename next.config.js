@@ -12,6 +12,8 @@ const nextConfig = {
     };
     return config;
   },
+  // Railway deployment configuration
+  output: 'standalone',
 }
 
 module.exports = nextConfig
